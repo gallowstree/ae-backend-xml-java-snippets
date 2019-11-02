@@ -1,4 +1,4 @@
-package com.agileengine;
+package com.agileengine.snippet.jsoup;
 
 import java.io.File;
 import java.io.IOException;

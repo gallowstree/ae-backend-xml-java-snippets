@@ -1,4 +1,4 @@
-package com.agileengine;
+package com.agileengine.snippet.jsoup;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ public class JsoupFindByIdSnippet {
         stringifiedAttributesOpt.ifPresent(attrs -> LOGGER.info("Target element attrs: [{}]", attrs));
     }
 
-    private static Optional<Element> findElementById(File htmlFile, String targetElementId) {
+    public static Optional<Element> findElementById(File htmlFile, String targetElementId) {
         try {
             Document doc = Jsoup.parse(
                     htmlFile,
