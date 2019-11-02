@@ -1,6 +1,7 @@
 package com.agileengine;
 
 import com.agileengine.elementfinder.ElementFinder;
+import org.apache.log4j.BasicConfigurator;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
@@ -19,6 +20,8 @@ public class Main {
     private static Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws IOException {
+        BasicConfigurator.configure();
+
         if (args.length < 2 || args.length > 3) {
             logger.warn("java -cp ElementFinder.jar <input_origin_file_path> <input_other_sample_file_path> [element_id]\n" +
                     "Where:\n" +
