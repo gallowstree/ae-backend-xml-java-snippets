@@ -3,8 +3,6 @@ package com.agileengine.elementfinder;
 import org.apache.commons.text.similarity.FuzzyScore;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -13,23 +11,21 @@ import static java.util.Arrays.asList;
 import static java.util.Comparator.comparingDouble;
 
 public class ElementFinder {
-    private static final Logger logger = LoggerFactory.getLogger(ElementFinder.class);
     private static final Set<String> FUZZY_MATCH_ATTRS = caseInsensitiveSet("class", "onclick");
     private FuzzyScore fuzzyScore = new FuzzyScore(Locale.ENGLISH);
 
-    public Optional<Element> findInDocument(Element target, Document document) {
-        return findInDocument(target, document, r -> {});
+    public Optional<ComparisonResult> findBestMatch(Element target, Document document) {
+        return findBestMatch(target, document, r -> {});
     }
 
-    public Optional<Element> findInDocument(Element target, Document document, Consumer<ComparisonResult> peeker) {
+    public Optional<ComparisonResult> findBestMatch(Element target, Document document, Consumer<ComparisonResult> peeker) {
         List<Element> searchPool = searchPool(target, document);
 
         return searchPool.stream()
                 .map(candidate -> compare(target, candidate))
-                .sorted(comparingDouble(ComparisonResult::getScore).reversed())
                 .peek(peeker)
-                .findFirst()
-                .map(ComparisonResult::getElement);
+                .max(comparingDouble(ComparisonResult::getScore));
+                //.map(ComparisonResult::getElement);
     }
 
     private ComparisonResult compare(Element target, Element candidate) {
@@ -42,7 +38,7 @@ public class ElementFinder {
             if (candidate.hasAttr(attrKey)) {
                 String attrValue = candidate.attr(attrKey);
 
-                if (FUZZY_MATCH_ATTRS.contains(attrValue)) {
+                if (FUZZY_MATCH_ATTRS.contains(attrKey)) {
                     double score = normalizedFuzzyScore(attrValue, expectedValue);
                     result.reportScore(attrKey + " (fuzzy match)", score);
                 } else {
@@ -50,13 +46,16 @@ public class ElementFinder {
                 }
             }
 
+            if (target.text() != null && candidate.text() != null) {
+                result.reportScore("Text (fuzzy match)", normalizedFuzzyScore(candidate.text(), target.text()));
+            }
         });
 
         return result;
     }
 
     private double normalizedFuzzyScore(String attrValue, String expectedValue) {
-        return fuzzyScore.fuzzyScore(attrValue, expectedValue) / fuzzyScore.fuzzyScore(expectedValue, expectedValue);
+        return fuzzyScore.fuzzyScore(attrValue, expectedValue).doubleValue() / fuzzyScore.fuzzyScore(expectedValue, expectedValue).doubleValue();
     }
 
     // This could be extracted to an interface, so that different strategies to narrow down the group of
@@ -75,7 +74,7 @@ public class ElementFinder {
     }
 
     // Ideally this would be immutable and have a builder :)
-    private static class ComparisonResult {
+    public static class ComparisonResult {
         private final Element element;
         private final Map<String, Double> components = new HashMap<>();
 
@@ -94,9 +93,27 @@ public class ElementFinder {
             return element;
         }
 
-        public void reportScore(String name, Double value) {
+        private void reportScore(String name, Double value) {
             components.put(name, value);
         }
 
+        @Override
+        public String toString() {
+            StringBuilder builder = new StringBuilder("Total score:");
+            builder.append(getScore());
+            builder.append(" candidate: ");
+            builder.append(element);
+            builder.append("\n");
+            components.forEach((k,v) -> {
+                builder.append("\t");
+                builder.append("criteria: ");
+                builder.append(k);
+                builder.append(" score: ");
+                builder.append(v);
+                builder.append("\n");
+            });
+
+            return builder.toString();
+        }
     }
 }

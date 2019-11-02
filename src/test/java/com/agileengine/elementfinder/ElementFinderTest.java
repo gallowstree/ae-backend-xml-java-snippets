@@ -1,5 +1,6 @@
 package com.agileengine.elementfinder;
 
+import com.agileengine.elementfinder.ElementFinder.ComparisonResult;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -25,10 +26,10 @@ public class ElementFinderTest {
         Element original = getOriginalElement();
         Document document = sampleDocument("./samples/sample-1-evil-gemini.html");
 
-        Optional<Element> found = elementFinder.findInDocument(original, document);
+        Optional<ComparisonResult> found = elementFinder.findBestMatch(original, document);
 
         assertThat(found.isPresent(), is(true));
-        assertThat(found.get().toString(), is("<a class=\"btn btn-success\" href=\"#check-and-ok\" title=\"Make-Button\" rel=\"done\" onclick=\"javascript:window.okDone(); return false;\"> Make everything OK </a>"));
+        assertThat(found.get().getElement().toString(), is("<a class=\"btn btn-success\" href=\"#check-and-ok\" title=\"Make-Button\" rel=\"done\" onclick=\"javascript:window.okDone(); return false;\"> Make everything OK </a>"));
     }
 
     @Test
@@ -36,10 +37,10 @@ public class ElementFinderTest {
         Element original = getOriginalElement();
         Document document = sampleDocument("./samples/sample-2-container-and-clone.html");
 
-        Optional<Element> found = elementFinder.findInDocument(original, document);
+        Optional<ComparisonResult> found = elementFinder.findBestMatch(original, document);
 
         assertThat(found.isPresent(), is(true));
-        assertThat(found.get().toString(), is("<a class=\"btn test-link-ok\" href=\"#ok\" title=\"Make-Button\" rel=\"next\" onclick=\"javascript:window.okComplete(); return false;\"> Make everything OK </a>"));
+        assertThat(found.get().getElement().toString(), is("<a class=\"btn test-link-ok\" href=\"#ok\" title=\"Make-Button\" rel=\"next\" onclick=\"javascript:window.okComplete(); return false;\"> Make everything OK </a>"));
     }
 
     @Test
@@ -47,10 +48,10 @@ public class ElementFinderTest {
         Element original = getOriginalElement();
         Document document = sampleDocument("./samples/sample-3-the-escape.html");
 
-        Optional<Element> found = elementFinder.findInDocument(original, document);
+        Optional<ComparisonResult> found = elementFinder.findBestMatch(original, document);
 
         assertThat(found.isPresent(), is(true));
-        assertThat(found.get().toString(), is("<a class=\"btn btn-success\" href=\"#ok\" title=\"Do-Link\" rel=\"next\" onclick=\"javascript:window.okDone(); return false;\"> Do anything perfect </a>"));
+        assertThat(found.get().getElement().toString(), is("<a class=\"btn btn-success\" href=\"#ok\" title=\"Do-Link\" rel=\"next\" onclick=\"javascript:window.okDone(); return false;\"> Do anything perfect </a>"));
     }
 
     @Test
@@ -58,10 +59,10 @@ public class ElementFinderTest {
         Element original = getOriginalElement();
         Document document = sampleDocument("./samples/sample-4-the-mash.html");
 
-        Optional<Element> found = elementFinder.findInDocument(original, document);
+        Optional<ComparisonResult> found = elementFinder.findBestMatch(original, document);
 
         assertThat(found.isPresent(), is(true));
-        assertThat(found.get().toString(), is("<a class=\"btn btn-success\" href=\"#ok\" title=\"Make-Button\" rel=\"next\" onclick=\"javascript:window.okFinalize(); return false;\"> Do all GREAT </a>"));
+        assertThat(found.get().getElement().toString(), is("<a class=\"btn btn-success\" href=\"#ok\" title=\"Make-Button\" rel=\"next\" onclick=\"javascript:window.okFinalize(); return false;\"> Do all GREAT </a>"));
 
     }
 

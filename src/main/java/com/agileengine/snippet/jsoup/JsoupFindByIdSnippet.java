@@ -38,10 +38,7 @@ public class JsoupFindByIdSnippet {
 
     public static Optional<Element> findElementById(File htmlFile, String targetElementId) {
         try {
-            Document doc = Jsoup.parse(
-                    htmlFile,
-                    CHARSET_NAME,
-                    htmlFile.getAbsolutePath());
+            Document doc = parse(htmlFile);
 
             return Optional.of(doc.getElementById(targetElementId));
 
@@ -49,6 +46,13 @@ public class JsoupFindByIdSnippet {
             LOGGER.error("Error reading [{}] file", htmlFile.getAbsolutePath(), e);
             return Optional.empty();
         }
+    }
+
+    public static Document parse(File htmlFile) throws IOException {
+        return Jsoup.parse(
+                htmlFile,
+                CHARSET_NAME,
+                htmlFile.getAbsolutePath());
     }
 
 }
